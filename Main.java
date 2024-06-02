@@ -1,10 +1,4 @@
-public class SistemaReservaVuelos {
-    private Vuelo vuelo;
-    
-    public SistemaReservaVuelos(Vuelo vuelo) {
-        this.vuelo = vuelo;
-    }
-    
+class SistemaReservaVuelos {
     public synchronized void reservarVuelo(Vuelo vuelo, Pasajero pasajero) {
         if (vuelo.reservarAsiento()) {
             System.out.println("Asiento reservado para " + pasajero.getNombre());
@@ -14,12 +8,10 @@ public class SistemaReservaVuelos {
     }
 }
 
-public class Vuelo {
-    private int numeroVuelo;
+class Vuelo {
     private int asientosDisponibles;
     
-    public Vuelo(int numeroVuelo, int asientosDisponibles) {
-        this.numeroVuelo = numeroVuelo;
+    public Vuelo(int asientosDisponibles) {
         this.asientosDisponibles = asientosDisponibles;
     }
     
@@ -32,13 +24,11 @@ public class Vuelo {
     }
 }
 
-public class Pasajero {
+class Pasajero {
     private String nombre;
-    private String numeroPasaporte;
     
-    public Pasajero(String nombre, String numeroPasaporte) {
+    public Pasajero(String nombre) {
         this.nombre = nombre;
-        this.numeroPasaporte = numeroPasaporte;
     }
     
     public String getNombre() {
@@ -48,13 +38,14 @@ public class Pasajero {
 
 public class Main {
     public static void main(String[] args) {
-        Vuelo vuelo = new Vuelo(123, 50);
-        SistemaReservaVuelos sistemaReserva = new SistemaReservaVuelos(vuelo);
+        Vuelo vuelo = new Vuelo(2); // Solo 2 asientos disponibles
+        SistemaReservaVuelos sistemaReserva = new SistemaReservaVuelos();
         
-        Thread pasajero1 = new Thread(() -> sistemaReserva.reservarVuelo(vuelo, new Pasajero("Alice", "ABCD123")));
-        Thread pasajero2 = new Thread(() -> sistemaReserva.reservarVuelo(vuelo, new Pasajero("Bob", "EFGH456")));
-        
-        pasajero1.start();
-        pasajero2.start();
+        // Crear varios hilos para simular múltiples pasajeros intentando reservar al mismo tiempo
+        for (int i = 1; i <= 5; i++) {
+            final int finalI = i;
+            Thread pasajero = new Thread(() -> sistemaReserva.reservarVuelo(vuelo, new Pasajero("Pasajero " + finalI)));
+            pasajero.start();
+        }
     }
 }
